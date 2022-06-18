@@ -42,8 +42,9 @@ class GlobalAppDrawer extends Component {
       >
         {this.props.pages.map((page) => (
           <ListItem key={page.name}>
-            <ListItemIcon>{page.icon}</ListItemIcon>
+            
             <ListItemButton>
+              <ListItemIcon>{page.icon}</ListItemIcon>
               <ListItemText primary={page.name} />
             </ListItemButton>
           </ListItem>
@@ -65,8 +66,9 @@ class GlobalAppDrawer extends Component {
         <Divider />
         {this.props.settings.map((setting) => (
           <ListItem key={setting.name}>
-            <ListItemIcon>{setting.icon}</ListItemIcon>
+            
             <ListItemButton>
+              <ListItemIcon>{setting.icon}</ListItemIcon>
               <ListItemText primary={setting.name} />
             </ListItemButton>
           </ListItem>
