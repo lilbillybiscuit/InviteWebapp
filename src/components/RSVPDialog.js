@@ -44,7 +44,15 @@ const datacolumns = [
   },
 ];
 
-const testdata = [{ id: 1, name: "John Doe" }];
+const testdata = [
+  { id: 1, name: "John Doe" },
+  { id: 1, name: "John Doe" },
+  { id: 1, name: "John Doe" },
+  { id: 1, name: "John Doe" },
+  { id: 1, name: "John Doe" },
+  { id: 1, name: "John Doe" },
+  { id: 1, name: "John Doe" },
+];
 
 const ZoomTransition = React.forwardRef(function ZoomTransition(props, ref) {
   return (
@@ -58,8 +66,12 @@ const ZoomTransition = React.forwardRef(function ZoomTransition(props, ref) {
 });
 
 class RSVPDialog extends Component {
-  state = {};
-
+  state = {
+    pageSize: 10,
+  };
+  setPageSize = (newPageSize) => {
+    this.setState({ pageSize: newPageSize });
+  }
   render() {
     return (
       <Dialog
@@ -162,18 +174,22 @@ class RSVPDialog extends Component {
             >
               Add a "Plus One"
             </Button>
-            <Box sx={{ width: '100%' }}>
-            <DataGrid
-              autoHeight
-              columns={datacolumns}
-              rows={testdata}
-              pageSize={10}
-              rowsPerPageOptions={[5]}
-              checkboxSelection
-            />
+            <Box sx={{ marginTop: "20px", width: "100%" }}>
+              {/* <DataGrid
+                onPageSizeChange={(newPageSize) => this.setPageSize(newPageSize)}
+                rowsPerPageOptions={[5, 10, 20]}
+                pagination
+                autoHeight
+                pageSize={this.state.pageSize}
+                columns={datacolumns}
+                rows={testdata}
+                checkboxSelection
+              /> */}
+              <PlusOneDataGrid />
             </Box>
           </FormControl>
-          <FormControl sx={{ width: "100%" }}>
+          <Divider sx={{ marginTop: "20px" }} />
+          <FormControl sx={{ marginTop: "10px", width: "100%" }}>
             <TextField
               multiline
               minRows={4}
