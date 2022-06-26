@@ -11,6 +11,7 @@ import {
   ListItemIcon,
 } from "@mui/material";
 
+
 class GlobalAppDrawer extends Component {
   state = {};
 
@@ -19,6 +20,8 @@ class GlobalAppDrawer extends Component {
       drawerOpen: open,
     });
   };
+
+  
 
   list = () => (
     <Box
@@ -43,13 +46,36 @@ class GlobalAppDrawer extends Component {
         {this.props.pages.map((page) => (
           <ListItem key={page.name}>
             
-            <ListItemButton>
+            <ListItemButton href={page.url}>
               <ListItemIcon>{page.icon}</ListItemIcon>
               <ListItemText primary={page.name} />
             </ListItemButton>
           </ListItem>
         ))}
-      </List>
+      </List> <Divider />
+      <List
+        subheader={
+          <ListSubheader
+            sx={{
+              fontWeight: "bold",
+            }}
+            component="div"
+            id="nested-pages-list-subheader"
+          >
+            Global Options
+          </ListSubheader>
+        }
+      >
+        {this.props.globalStuff.map((page) => (
+          <ListItem key={page.name}>
+            
+            <ListItemButton href={page.url}>
+              <ListItemIcon>{page.icon}</ListItemIcon>
+              <ListItemText primary={page.name} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List> <Divider />
       <List
         subheader={
           <ListSubheader
@@ -63,11 +89,11 @@ class GlobalAppDrawer extends Component {
           </ListSubheader>
         }
       >
-        <Divider />
+       
         {this.props.settings.map((setting) => (
           <ListItem key={setting.name}>
             
-            <ListItemButton>
+            <ListItemButton href={setting.url}>
               <ListItemIcon>{setting.icon}</ListItemIcon>
               <ListItemText primary={setting.name} />
             </ListItemButton>

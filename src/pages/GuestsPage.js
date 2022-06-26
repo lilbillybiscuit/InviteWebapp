@@ -208,7 +208,7 @@ export default function ColumnTypesGrid() {
     () => [
       {
         field: "coming",
-        headerName: "",
+        headerName: "Status",
         renderCell: (params) => renderStatus(params.value),
         width: 30,
       },
@@ -261,7 +261,7 @@ export default function ColumnTypesGrid() {
 
   return (
     <Container
-    disableGutters
+      maxWidth="md"
       sx={{
         height: 400,
         width: "100%",

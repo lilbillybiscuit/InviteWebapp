@@ -27,10 +27,11 @@ import Divider from "@mui/material/Divider";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import AddIcon from "@mui/icons-material/Add";
 import { DataGrid } from "@mui/x-data-grid";
-
+import Color from "./Color";
 //Self made components
 import PlusOneDataGrid from "./PlusOneDataGrid";
-
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 const datacolumns = [
   {
     field: "id",
@@ -64,11 +65,15 @@ const ZoomTransition = React.forwardRef(function ZoomTransition(props, ref) {
     />
   );
 });
+const theme = useTheme();
 
 class RSVPDialog extends Component {
   state = {
     pageSize: 10,
   };
+  
+  fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  
   setPageSize = (newPageSize) => {
     this.setState({ pageSize: newPageSize });
   }
@@ -78,6 +83,7 @@ class RSVPDialog extends Component {
         open={this.props.dialogOpen}
         onClose={this.props.handleClose}
         TransitionComponent={ZoomTransition}
+        fullScreen={this.fullScreen}
       >
         <DialogTitle>RSVP</DialogTitle>
         <DialogContent>
@@ -90,7 +96,7 @@ class RSVPDialog extends Component {
                   <Radio
                     sx={{
                       "&.Mui-checked": {
-                        color: "#4caf50",
+                        color: Color.yesColor,
                       },
                     }}
                   />
@@ -103,7 +109,7 @@ class RSVPDialog extends Component {
                   <Radio
                     sx={{
                       "&.Mui-checked": {
-                        color: "#ffc107",
+                        color: Color.maybeColor,
                       },
                     }}
                   />
@@ -116,7 +122,7 @@ class RSVPDialog extends Component {
                   <Radio
                     sx={{
                       "&.Mui-checked": {
-                        color: "#ff5722",
+                        color: Color.noColor,
                       },
                     }}
                   />
@@ -189,6 +195,15 @@ class RSVPDialog extends Component {
             </Box>
           </FormControl>
           <Divider sx={{ marginTop: "20px" }} />
+          <Typography
+            variant="h6"
+            component="h6"
+            sx={{
+              marginTop: "10px",
+            }}
+          >
+            Optional Information
+          </Typography>
           <FormControl sx={{ marginTop: "10px", width: "100%" }}>
             <TextField
               multiline
