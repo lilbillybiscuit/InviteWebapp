@@ -22,6 +22,7 @@ import PeopleIcon from "@mui/icons-material/People";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MusicNoteIcon from "@mui/icons-material/MusicNote";
+import NetworkWifiIcon from '@mui/icons-material/NetworkWifi';
 
 import GlobalAppDrawer from "./GlobalAppDrawer";
 import GlobalUserSettingsMenu from "./GlobalUserSettingsMenu";
@@ -35,6 +36,7 @@ const pages = [
 ];
 const globalStuff = [
   { name: "Music Control", url: "/music", icon: <MusicNoteIcon /> },
+  { name: "Guest Wifi", url: "/wifi", icon: <NetworkWifiIcon /> },
 ];
 const settings = [
   { name: "Profile", url: "/profile", icon: <AccountCircleIcon /> },
@@ -196,7 +198,7 @@ class ResponsiveAppBar extends Component {
                       href={obj.url}
                       sx={{ my: 2, color: "white", display: "block" }}
                     >
-                      {obj.name}
+                      <strong>{obj.name}</strong>
                     </Button>
                   ))}
                 </Box>

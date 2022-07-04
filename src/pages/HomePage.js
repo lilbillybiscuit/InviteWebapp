@@ -10,12 +10,13 @@ import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import ButtonGroup from "@mui/material/ButtonGroup";
-
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
 function getWindowDimensions() {
   const { innerWidth: width, innerHeight: height } = window;
   return {
     width,
-    height
+    height,
   };
 }
 
@@ -36,19 +37,26 @@ class HomePage extends Component {
     this.setState({ dialogOpen: false });
   };
 
-
   render() {
     return (
       <React.Fragment>
         <img src="/gradImage.jpg" style={{ width: "100%" }} />
         <Container maxWidth="md">
-          <Paper elevation={3} sx={{mt: 3, display: "flex", padding: "20px"}}>
+          <Alert severity="warning" sx={{mt: 3}}>
+            <AlertTitle>Warning</AlertTitle>
+            You have limited access as your invite link has been used more than once. You can still RSVP, but you may not interact with the music or gallery pages.
+          </Alert>
+          <Alert severity="warning" sx={{mt: 3}}>
+            <AlertTitle>Warning</AlertTitle>
+            Key functions such as RSVPing are disabled. Please use a valid invite link, or enter your email to recover your session.
+            </Alert>
+          <Paper elevation={3} sx={{ mt: 3, display: "flex", padding: "20px" }}>
             <Typography variant="h5">Will you attend?</Typography>
             <ButtonGroup variant="text" size="large">
               <Button>Yes</Button>
               <Button>Maybe</Button>
               <Button>No</Button>
-              </ButtonGroup>
+            </ButtonGroup>
           </Paper>
           <Button onClick={this.handleDialogOpen}>Hi</Button>
           <RSVPDialog

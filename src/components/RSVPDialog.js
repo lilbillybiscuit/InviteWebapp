@@ -23,6 +23,8 @@ import Grow from "@mui/material/Grow";
 import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
 import Divider from "@mui/material/Divider";
+import ParentSize from "@visx/responsive/lib/components/ParentSize";
+import Slider from "@mui/material/Slider";
 //Icons
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import AddIcon from "@mui/icons-material/Add";
@@ -30,8 +32,9 @@ import { DataGrid } from "@mui/x-data-grid";
 import Color from "./Color";
 //Self made components
 import PlusOneDataGrid from "./PlusOneDataGrid";
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { useTheme } from '@mui/material/styles';
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
+import ArrivalTimeLineChart from "./ArrivalTimeLineChart";
 const datacolumns = [
   {
     field: "id",
@@ -54,7 +57,9 @@ const testdata = [
   { id: 1, name: "John Doe" },
   { id: 1, name: "John Doe" },
 ];
-
+function valueToTime(value) {
+  return `${value} min`;
+}
 const ZoomTransition = React.forwardRef(function ZoomTransition(props, ref) {
   return (
     <Zoom
@@ -65,18 +70,28 @@ const ZoomTransition = React.forwardRef(function ZoomTransition(props, ref) {
     />
   );
 });
-const theme = useTheme();
+//const theme = useTheme();
 
 class RSVPDialog extends Component {
   state = {
     pageSize: 10,
+    arrivalData: {
+      sliderValue: [0,360]
+    }
   };
-  
-  fullScreen = useMediaQuery(theme.breakpoints.down('md'));
-  
+
+  fullScreen = false; //useMediaQuery(theme.breakpoints.down('md'));
+  handleArrivalSliderChange = (event, newValue) => {
+    this.setState({
+      arrivalData: {
+        sliderValue: newValue
+      }
+    });
+  }
+
   setPageSize = (newPageSize) => {
     this.setState({ pageSize: newPageSize });
-  }
+  };
   render() {
     return (
       <Dialog
@@ -156,6 +171,45 @@ class RSVPDialog extends Component {
                 bs that you see on every other site
               </Typography>
             </FormGroup>
+          </FormControl>
+          <Divider sx={{ margin: "1rem 0" }} />
+          <Typography
+            variant="h6"
+            component="h6"
+            sx={{
+              marginTop: "10px",
+            }}
+          >
+            Arrival Time
+          </Typography>
+          <FormControl sx={{ marginTop: "0px", width: "100%" }}>
+            <FormLabel>
+              Doesn't have to be accurate, but please approximate your arrival
+              time for balancing purposes. Thanks!
+            </FormLabel>
+            <Box
+              sx={{
+                height: "200px",
+                mt: 2,
+                mb: 2
+              }}
+            >
+              <ParentSize>
+                {({ width, height }) => (
+                  <ArrivalTimeLineChart width={width} height={height} />
+                )}
+              </ParentSize>
+            </Box>
+
+            <Slider
+        getAriaLabel={() => 'Time range'}
+        value={this.state.arrivalData.sliderValue}
+        onChange={this.handleArrivalSliderChange}
+        valueLabelDisplay="auto"
+        getAriaValueText={valueToTime}
+        min={0}
+        max={360}
+      />
           </FormControl>
           <Divider sx={{ marginTop: "20px" }} />
           <Typography

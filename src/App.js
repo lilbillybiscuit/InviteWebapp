@@ -1,6 +1,13 @@
 import logo from "./logo.svg";
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Switch,
+  useRouteMatch,
+  useParams,
+} from "react-router-dom";
 import GradAppBar from "./components/GradAppBar";
 
 //Import pages
@@ -30,10 +37,7 @@ function HideOnScroll(props) {
 function App() {
   return (
     <BrowserRouter>
-      {/* <HideOnScroll>
-        
-      </HideOnScroll> */}
-<GradAppBar />
+      <GradAppBar />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/activity" element={<ActivityPage />} />
