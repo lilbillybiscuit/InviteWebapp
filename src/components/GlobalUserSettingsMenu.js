@@ -5,6 +5,8 @@ import Checkbox from "@mui/material/Checkbox";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import Snackbars from "./Snackbars";
+import ChangeAccountIDDialog from "./ChangeAccountIDDialog";
+import globals from "../globals";
 class GlobalUserSettingsMenu extends Component {
   state = {
     checkboxA: {
@@ -25,11 +27,15 @@ class GlobalUserSettingsMenu extends Component {
     snackbars: {
       errorOpen: false,
       successOpen: false,
-    }
+    },
+    changeAccountIDDialogOpen: false,
   };
+
   componentDidUpdate(prevProps) {
     if (prevProps.open !== this.props.open && this.props.open) {
-      fetch("http://localhost:8000/api/usersettings").then((res) => {
+      fetch("http://localhost:8000/api/usersettings", {
+        credentials: "include",
+      }).then((res) => {
         if (res.status === 200) {
           res.json().then((res) => {
             this.setState({
@@ -69,16 +75,23 @@ class GlobalUserSettingsMenu extends Component {
 
   handleChangeA = (event) => {
     if (this.state.checkboxA.updating) {
-      console.log("Still updating0");
       return;
     }
     this.state.checkboxA.updating = true;
-    fetch("http://localhost:8000/api/success").then((res) => {
+    var newState = !this.state.checkboxA.checked ?? false;
+    fetch(`${globals.api_domain}/api/usersettings/update`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ notifyActivityInvolvingMe: newState }),
+    }).then((res) => {
       if (res.status === 200) {
         res.json().then((res) => {
           this.setState({
             checkboxA: {
-              checked: !this.state.checkboxA.checked,
+              checked: res.settings.notifyActivityInvolvingMe ?? false,
               disabled: false,
             },
             snackbars: {
@@ -104,16 +117,23 @@ class GlobalUserSettingsMenu extends Component {
 
   handleChangeB = (event) => {
     if (this.state.checkboxB.updating) {
-      console.log("Still updating0");
       return;
     }
     this.state.checkboxB.updating = true;
-    fetch("http://localhost:8000/api/success").then((res) => {
+    var newState = !this.state.checkboxB.checked ?? false;
+    fetch(`${globals.api_domain}/api/usersettings/update`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ notifyEventActivity: newState }),
+    }).then((res) => {
       if (res.status === 200) {
         res.json().then((res) => {
           this.setState({
             checkboxB: {
-              checked: !this.state.checkboxB.checked,
+              checked: res.settings.notifyEventActivity ?? false,
               disabled: false,
             },
             snackbars: {
@@ -137,19 +157,25 @@ class GlobalUserSettingsMenu extends Component {
     });
   };
 
-
   handleChangeC = (event) => {
     if (this.state.checkboxC.updating) {
-      console.log("Still updating0");
       return;
     }
     this.state.checkboxC.updating = true;
-    fetch("http://localhost:8000/api/success").then((res) => {
+    var newState = !this.state.checkboxC.checked ?? false;
+    fetch(`${globals.api_domain}/api/usersettings/update`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ notifyGuestRSVP: newState }),
+    }).then((res) => {
       if (res.status === 200) {
         res.json().then((res) => {
           this.setState({
             checkboxC: {
-              checked: !this.state.checkboxC.checked,
+              checked: res.settings.notifyGuestRSVP ?? false,
               disabled: false,
             },
             snackbars: {
@@ -182,7 +208,7 @@ class GlobalUserSettingsMenu extends Component {
         errorOpen: false,
       },
     });
-  }
+  };
 
   handleSuccessSnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -193,7 +219,7 @@ class GlobalUserSettingsMenu extends Component {
         successOpen: false,
       },
     });
-  }
+  };
 
   render() {
     return (
@@ -211,7 +237,9 @@ class GlobalUserSettingsMenu extends Component {
               size="small"
             />
           </ListItemIcon>
-          <ListItemText>Notify me when I'm involved in an activity</ListItemText>
+          <ListItemText>
+            Notify me when I'm involved in an activity
+          </ListItemText>
         </MenuItem>
         <MenuItem onClick={this.handleChangeB}>
           <ListItemIcon>
@@ -234,6 +262,12 @@ class GlobalUserSettingsMenu extends Component {
           <ListItemText>Notify me on new RSVP </ListItemText>
         </MenuItem>
         <Divider />
+        <MenuItem
+          onClick={() => this.setState({ changeAccountIDDialogOpen: true })}
+        >
+          <ListItemIcon></ListItemIcon>
+          <ListItemText>Change Accounts</ListItemText>
+        </MenuItem>
         <MenuItem onClick={this.props.handleMenuOpen}>
           <ListItemIcon></ListItemIcon>
           <ListItemText>Open Menu</ListItemText>
@@ -250,6 +284,10 @@ class GlobalUserSettingsMenu extends Component {
           message="Settings updated successfully."
           severity="success"
           onClose={this.handleSuccessSnackbarClose}
+        />
+        <ChangeAccountIDDialog
+          open={this.state.changeAccountIDDialogOpen}
+          onClose={() => this.setState({ changeAccountIDDialogOpen: false })}
         />
       </Menu>
     );

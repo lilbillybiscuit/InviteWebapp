@@ -12,6 +12,7 @@ import ActivityPage from "./pages/ActivityPage";
 import HomePage from "./pages/HomePage";
 import GuestsPage from "./pages/GuestsPage";
 import MusicControl from "./pages/MusicControl";
+import TokenProcessor from "./pages/TokenProcessor";
 
 function App() {
   return (
@@ -19,9 +20,11 @@ function App() {
       <GradAppBar />
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/404" element={<HomePage />} />
         <Route path="/activity" element={<ActivityPage />} />
         <Route path="/guests" element={<GuestsPage />} />
         <Route path="/music" element={<MusicControl />} />
+        <Route path="/:token" element={<TokenProcessor />} />
       </Routes>
     </BrowserRouter>
   );
