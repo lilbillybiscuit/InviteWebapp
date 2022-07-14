@@ -26,7 +26,7 @@ import NetworkWifiIcon from '@mui/icons-material/NetworkWifi';
 
 import GlobalAppDrawer from "./GlobalAppDrawer";
 import GlobalUserSettingsMenu from "./GlobalUserSettingsMenu";
-
+import globals from "../globals";
 const toolbarColor = "#FFFFFF";
 
 const pages = [
@@ -63,6 +63,7 @@ class ResponsiveAppBar extends Component {
     drawerOpen: false,
     menuOpen: false,
     dropdownOpen: false,
+    name: "",
   };
 
   toggleDrawer = (open) => (event) => {
@@ -92,6 +93,26 @@ class ResponsiveAppBar extends Component {
   handleMenuOpen = (event) => {
     this.setState({ anchorElNav: event.currentTarget });
   };
+
+  componentDidMount = () => {
+    fetch(`${globals.api_domain}/api/session/getname`, {
+      credentials: "include",
+    }).then((res) => {
+      if (res.status === 200) {
+        res.json().then((res) => {
+          if (res.name) {
+            this.setState({ name: res.name });
+          } else if (res.username) {
+            this.setState({ name: res.username });
+          } else {
+            this.setState({ name: "Guest" });
+          }
+        });
+      } else {
+        this.setState({ name: "Guest" });
+      }
+    })
+  }
 
   render() {
     return (
@@ -211,7 +232,7 @@ class ResponsiveAppBar extends Component {
                         color: "white",
                       }}
                     >
-                      Name Here
+                      {this.state.name}
                     </Button>
                   </Tooltip>
                 </Box>

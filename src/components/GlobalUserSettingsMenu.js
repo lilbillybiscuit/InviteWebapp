@@ -33,7 +33,7 @@ class GlobalUserSettingsMenu extends Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.open !== this.props.open && this.props.open) {
-      fetch("http://localhost:8000/api/usersettings", {
+      fetch(`${globals.api_domain}/api/usersettings`, {
         credentials: "include",
       }).then((res) => {
         if (res.status === 200) {

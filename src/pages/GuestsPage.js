@@ -13,6 +13,9 @@ import Snackbar from "@mui/material/Snackbar";
 import Color from "../components/Color";
 import { darken, lighten } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import AddIcon from "@mui/icons-material/Add";
 //Icons
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
@@ -63,6 +66,7 @@ const initialRows = [
     discount: "junior",
   },
 ];
+
 const initialRows2 = [
   {
     id: 32539408,
@@ -119,7 +123,8 @@ export default function ColumnTypesGrid() {
   const [rows, setRows] = React.useState(initialRows2);
   const [copySnackbarOpen, setCopySnackbarOpen] = React.useState(false);
   const [deleteSnackbarOpen, setDeleteSnackbarOpen] = React.useState(false);
-  const [deleteSuccessSnackbarOpen, setDeleteSuccessSnackbarOpen] = React.useState(false);
+  const [deleteSuccessSnackbarOpen, setDeleteSuccessSnackbarOpen] =
+    React.useState(false);
   const handleCopySnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -132,14 +137,14 @@ export default function ColumnTypesGrid() {
       return;
     }
     setDeleteSnackbarOpen(false);
-  }
+  };
 
   const handleDeleteSuccessSnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
     setDeleteSuccessSnackbarOpen(false);
-  }
+  };
 
   const isLoading = (id) => {
     const row1 = rows.find((row) => row.id === id);
@@ -156,20 +161,19 @@ export default function ColumnTypesGrid() {
         prevRows.map((row) => (row.id === id ? { ...row, loading: true } : row))
       );
 
-      fetch("http://localhost:8000/api/error")
-        .then((res) => {
-          if (res.status === 200) {
-            setRows((prevRows) => prevRows.filter((row) => row.id !== id));
-            setDeleteSuccessSnackbarOpen(true);
-          } else {
-            setRows((prevRows) =>
-              prevRows.map((row) =>
-                row.id === id ? { ...row, loading: false } : row
-              )
-            );
-            setDeleteSnackbarOpen(true);
-          }
-        })
+      fetch("http://localhost:8000/api/error").then((res) => {
+        if (res.status === 200) {
+          setRows((prevRows) => prevRows.filter((row) => row.id !== id));
+          setDeleteSuccessSnackbarOpen(true);
+        } else {
+          setRows((prevRows) =>
+            prevRows.map((row) =>
+              row.id === id ? { ...row, loading: false } : row
+            )
+          );
+          setDeleteSnackbarOpen(true);
+        }
+      });
     },
     []
   );
@@ -263,7 +267,7 @@ export default function ColumnTypesGrid() {
     <Container
       maxWidth="md"
       sx={{
-        height: 400,
+        height: "calc(100vh - 200px)",
         width: "100%",
 
         "& .super-app-theme--noresponse": {
@@ -315,7 +319,32 @@ export default function ColumnTypesGrid() {
         },
       }}
     >
+      <Box
+        sx={{
+          mt: 3,
+          display: "flex",
+        }}
+      >
+        <Typography
+          variant="h4"
+          sx={{
+            flexGrow: 1,
+          }}
+        >
+          Guests
+        </Typography>
+        <Button
+          sx={{
+            flexGrow: 0,
+          }}
+          variant="contained"
+          startIcon={<AddIcon />}
+        >
+          Invite someone
+        </Button>
+      </Box>
       <DataGrid
+        sx={{ mt: 3 }}
         columns={columns2}
         rows={rows}
         getRowClassName={(params) => `super-app-theme--${params.row.status}`}
