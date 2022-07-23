@@ -40,9 +40,7 @@ export default function AlertDialog() {
       case "pending":
         return <CircularProgress />;
       case "error":
-        return (
-          "You may still access this page, but some information will be hidden"
-        );
+        return "You may still access this page, but some information will be hidden";
       case "success":
         return (
           <Avatar sx={{ bgcolor: green[500] }}>
@@ -63,7 +61,6 @@ export default function AlertDialog() {
       method: "GET",
       credentials: "include",
     });
-    console.log(response);
     if (response.status === 200) {
       var json = await response.json();
       // no need to check, session already exists
@@ -81,47 +78,49 @@ export default function AlertDialog() {
   const userAuthenticateToken = () => {
     setOpen(true);
     authenticateToken();
-  }
+  };
   const authenticateToken = async (userInitiated) => {
     setConfirmOpen(false);
-    var response = await fetch(`${globals.api_domain}/api/session/auth`, {
+    fetch(`${globals.api_domain}/api/session/auth`, {
       method: "POST",
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ token: params.token }),
+    }).then((res) => {
+      if (res.status === 200) {
+        res.json().then((res) => {
+          if (res.success) {
+            setOpen(true);
+            setAuthenticated("success");
+            setValidToken(true);
+            setTimeout(() => {
+              navigate("/");
+            }, 1000);
+          } else {
+            setOpen(false);
+            setTimeout(() => {
+              setAuthenticated("error");
+              setOpen(true);
+            }, 200);
+          }
+        });
+      } else {
+        setOpen(false);
+        setTimeout(() => {
+          setAuthenticated("error");
+          setOpen(true);
+        }, 200);
+      }
     });
-
-    if (response.status === 200 && (await response.json().success)) {
-
-      setOpen(true);
-      setAuthenticated("success");
-      setValidToken(true);
-      setTimeout(() => {
-        navigate("/");
-      }, 1000);
-    } else {
-      setOpen(false);
-      setTimeout(() => {
-        setAuthenticated("error");
-        setOpen(true);
-      }, 200);
-      
-    }
   };
-
   React.useEffect(() => {
-    console.log("Ran once");
     //first check if user is already authenticated
-    setTimeout(() => {
-      if (!confirmOpen && !open) setOpen(true);
-    }, 300);
     authenticateAsync().then((res) => {
       // res= true: account already exists, ask to replace
       // res= false: account does not exist
       if (res) {
-        console.log(res);
         if (verifyTokenFormat()) {
           //token is valid, ask to replace session
           setOpen(false);
@@ -148,9 +147,7 @@ export default function AlertDialog() {
         aria-describedby="authentication-dialog-description"
         maxWidth="xs"
       >
-        <DialogTitle id="alert-dialog-title">
-          {renderText()}
-        </DialogTitle>
+        <DialogTitle id="alert-dialog-title">{renderText()}</DialogTitle>
         <DialogContent
           sx={{
             m: "auto",
@@ -158,9 +155,11 @@ export default function AlertDialog() {
         >
           {renderIcon()}
         </DialogContent>
-        {authenticated === "error" ? <DialogActions>
-          <Button onClick={() => navigate("/")}>ok</Button>
-        </DialogActions> : null}
+        {authenticated === "error" ? (
+          <DialogActions>
+            <Button onClick={() => navigate("/")}>ok</Button>
+          </DialogActions>
+        ) : null}
       </Dialog>
       <Dialog
         open={confirmOpen}
@@ -186,7 +185,9 @@ export default function AlertDialog() {
           >
             No
           </Button>
-          <Button color="error" onClick={userAuthenticateToken}>Yes</Button>
+          <Button color="error" onClick={userAuthenticateToken}>
+            Yes
+          </Button>
         </DialogActions>
       </Dialog>
     </React.Fragment>

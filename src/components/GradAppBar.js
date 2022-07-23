@@ -13,6 +13,7 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import useScrollTrigger from "@mui/material/useScrollTrigger";
 import Slide from "@mui/material/Slide";
+import {grey} from "@mui/material/colors";
 
 //Icons
 import SchoolIcon from "@mui/icons-material/School";
@@ -22,7 +23,7 @@ import PeopleIcon from "@mui/icons-material/People";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MusicNoteIcon from "@mui/icons-material/MusicNote";
-import NetworkWifiIcon from '@mui/icons-material/NetworkWifi';
+import WifiIcon from '@mui/icons-material/Wifi';
 
 import GlobalAppDrawer from "./GlobalAppDrawer";
 import GlobalUserSettingsMenu from "./GlobalUserSettingsMenu";
@@ -30,13 +31,13 @@ import globals from "../globals";
 const toolbarColor = "#FFFFFF";
 
 const pages = [
-  { name: "Activity", url: "/activity", icon: <NotificationsIcon /> },
+//  { name: "Activity", url: "/activity", icon: <NotificationsIcon /> },
   { name: "Messages", url: "/messages", icon: <MailIcon /> },
   { name: "Guests", url: "/guests", icon: <PeopleIcon /> },
 ];
 const globalStuff = [
   { name: "Music Control", url: "/music", icon: <MusicNoteIcon /> },
-  { name: "Guest Wifi", url: "/wifi", icon: <NetworkWifiIcon /> },
+  { name: "Guest Wifi", url: "/wifi", icon: <WifiIcon /> },
 ];
 const settings = [
   { name: "Profile", url: "/profile", icon: <AccountCircleIcon /> },
@@ -121,7 +122,7 @@ class ResponsiveAppBar extends Component {
           <AppBar
             color="transparent"
             sx={{
-              backgroundColor: "rgba(137, 2, 247, 0.8)",
+              backgroundColor: "rgba(37, 37, 37, 0.8)",
               backdropFilter: "blur(5px)",
             }}
           >
@@ -198,7 +199,7 @@ class ResponsiveAppBar extends Component {
                   variant="h5"
                   noWrap
                   component="a"
-                  href=""
+                  href="/"
                   sx={{
                     mr: 2,
                     display: { xs: "flex", md: "none" },

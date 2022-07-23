@@ -15,15 +15,16 @@ import { darken, lighten } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add";
+import AddTokenMenu from "../components/AddTokenMenu";
 //Icons
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-
 import CloseIcon from "@mui/icons-material/Close";
 import RemoveIcon from "@mui/icons-material/Remove";
 import CheckIcon from "@mui/icons-material/Check";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import CircularProgress from "@mui/material/CircularProgress";
+import AddIcon from "@mui/icons-material/Add";
+import globals from "../globals";
 // import LoadingButton from "@mui/lab/LoadingButton";
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -120,11 +121,14 @@ const renderStatus = (props) => {
   } else return <QuestionMarkIcon />;
 };
 export default function ColumnTypesGrid() {
-  const [rows, setRows] = React.useState(initialRows2);
+  const [rows, setRows] = React.useState([]);
   const [copySnackbarOpen, setCopySnackbarOpen] = React.useState(false);
   const [deleteSnackbarOpen, setDeleteSnackbarOpen] = React.useState(false);
   const [deleteSuccessSnackbarOpen, setDeleteSuccessSnackbarOpen] =
     React.useState(false);
+  const [loadFailureSnackbarOpen, setLoadFailureSnackbarOpen] =
+    React.useState(false);
+  const AddTokenRef = React.useRef(null);
   const handleCopySnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -132,6 +136,25 @@ export default function ColumnTypesGrid() {
     setCopySnackbarOpen(false);
   };
 
+  const getRowsApi = () => {
+    fetch(`${globals.api_domain}/api/guests/get/all`, {
+      method: "GET",
+      credentials: "include",
+    }).then((res) => {
+      if (res.status === 200) {
+        res.json().then((data) => {
+          setRows(data.guests);
+          console.log(data.guests);
+        });
+      } else {
+        setLoadFailureSnackbarOpen(true);
+      }
+    });
+  };
+
+  React.useEffect(() => {
+    getRowsApi();
+  }, []);
   const handleDeleteSnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -146,22 +169,23 @@ export default function ColumnTypesGrid() {
     setDeleteSuccessSnackbarOpen(false);
   };
 
-  const isLoading = (id) => {
-    const row1 = rows.find((row) => row.id === id);
-    console.log(row1);
-    if (!row1.loading) {
-      return false;
-    }
-    return row1.loading;
-  };
-
   const deleteUser = React.useCallback(
     (id) => () => {
       setRows((prevRows) =>
         prevRows.map((row) => (row.id === id ? { ...row, loading: true } : row))
       );
-
-      fetch("http://localhost:8000/api/error").then((res) => {
+      const thisRow = rows.find((row) => row.id === id);
+      console.log(rows, id);
+      fetch("http://localhost:8000/api/tokens/delete", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token: thisRow.id,
+        }),
+      }).then((res) => {
         if (res.status === 200) {
           setRows((prevRows) => prevRows.filter((row) => row.id !== id));
           setDeleteSuccessSnackbarOpen(true);
@@ -175,51 +199,32 @@ export default function ColumnTypesGrid() {
         }
       });
     },
-    []
-  );
-
-  const toggleAdmin = React.useCallback(
-    (id) => () => {
-      setRows((prevRows) =>
-        prevRows.map((row) =>
-          row.id === id ? { ...row, isAdmin: !row.isAdmin } : row
-        )
-      );
-    },
-    []
-  );
-
-  const duplicateUser = React.useCallback(
-    (id) => () => {
-      setRows((prevRows) => {
-        const rowToDuplicate = prevRows.find((row) => row.id === id);
-        return [...prevRows, { ...rowToDuplicate, id: Date.now() }];
-      });
-    },
-    []
+    [rows]
   );
 
   const copyURL = React.useCallback(
     (id) => () => {
+      console.log(rows);
       const rowToCopy = rows.find((row) => row.id === id);
       navigator.clipboard.writeText(rowToCopy.shareLink);
       setCopySnackbarOpen(true);
     },
-    []
+    [rows]
   );
 
   const columns2 = React.useMemo(
     () => [
       {
-        field: "coming",
+        field: "rsvp",
         headerName: "Status",
         renderCell: (params) => renderStatus(params.value),
-        width: 30,
+        width: 60,
       },
       {
         field: "name",
         type: "string",
         headerName: "Name",
+        renderCell: (params) => <strong>{params.value}</strong>,
         width: 100,
       },
       {
@@ -228,7 +233,13 @@ export default function ColumnTypesGrid() {
         headerName: "Share Link",
         width: 300,
       },
-      { field: "created", type: "date", headerName: "Created", width: 100 },
+      {
+        field: "created",
+        type: "string",
+        headerName: "Created",
+        width: 110,
+        renderCell: (params) => {"Hi"},
+      },
       {
         field: "invitedby",
         type: "string",
@@ -240,24 +251,30 @@ export default function ColumnTypesGrid() {
         type: "actions",
         headerName: "Actions",
         width: 80,
-        getActions: (params) => [
-          <GridActionsCellItem
-            icon={<ContentCopyIcon />}
-            label={"Copy Link"}
-            onClick={copyURL(params.id)}
-          />,
-          <GridActionsCellItem
-            icon={
-              params.row.loading ? (
-                <CircularProgress size={20} />
-              ) : (
-                <DeleteIcon />
-              )
-            }
-            label={"Delete"}
-            onClick={deleteUser(params.id)}
-          />,
-        ],
+        getActions: (params) => {
+          return params.row.actions
+            ? []
+            : [
+                <GridActionsCellItem
+                  disabled={params.row.actions}
+                  icon={<ContentCopyIcon />}
+                  label={"Copy Link"}
+                  onClick={copyURL(params.id)}
+                />,
+                <GridActionsCellItem
+                  disabled={params.row.actions}
+                  icon={
+                    params.row.loading ? (
+                      <CircularProgress size={20} />
+                    ) : (
+                      <DeleteIcon />
+                    )
+                  }
+                  label={"Delete"}
+                  onClick={deleteUser(params.id)}
+                />,
+              ];
+        },
       },
     ],
     [deleteUser, copyURL]
@@ -331,7 +348,7 @@ export default function ColumnTypesGrid() {
             flexGrow: 1,
           }}
         >
-          Guests
+          <strong>Guests</strong>
         </Typography>
         <Button
           sx={{
@@ -339,15 +356,19 @@ export default function ColumnTypesGrid() {
           }}
           variant="contained"
           startIcon={<AddIcon />}
+          onClick={(event) => {
+            AddTokenRef.current?.setMenuOpen(event);
+          }}
         >
           Invite someone
         </Button>
+        <AddTokenMenu ref={AddTokenRef} refreshList={getRowsApi} />
       </Box>
       <DataGrid
         sx={{ mt: 3 }}
         columns={columns2}
         rows={rows}
-        getRowClassName={(params) => `super-app-theme--${params.row.status}`}
+        getRowClassName={(params) => `super-app-theme--${params.row.rsvp}`}
       />
       <Snackbar
         open={copySnackbarOpen}
@@ -386,6 +407,19 @@ export default function ColumnTypesGrid() {
           sx={{ width: "100%" }}
         >
           Successfully deleted the invite
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={loadFailureSnackbarOpen}
+        autoHideDuration={3000}
+        onClose={() => setLoadFailureSnackbarOpen(false)}
+      >
+        <Alert
+          onClose={() => setLoadFailureSnackbarOpen(false)}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          An error occured while loading the guest list
         </Alert>
       </Snackbar>
     </Container>

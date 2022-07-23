@@ -14,7 +14,13 @@ class MusicControl extends Component {
             marginTop: "20px"
           }}>
             <AlertTitle>Warning</AlertTitle>
-            Music Control will be available soon
+            Music Control will be available soon.
+          </Alert>
+          <Alert severity="warning" sx={{
+            marginTop: "20px"
+          }}>
+            <AlertTitle>Vocal Removal Unavailable</AlertTitle>
+            Currently training ML model {"(approx. 7 days remaining)"}
           </Alert>
           <Typography variant="h4" sx={{
             marginTop: "20px",

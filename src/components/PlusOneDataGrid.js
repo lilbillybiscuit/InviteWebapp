@@ -193,11 +193,13 @@ export default function ColumnTypesGrid() {
       });
     },
     []
-  );
+  ); 
 
   const copyURL = React.useCallback(
     (id) => () => {
+      console.log(rows, id);
       const rowToCopy = rows.find((row) => row.id === id);
+      console.log(rowToCopy);
       navigator.clipboard.writeText(rowToCopy.shareLink);
       setCopySnackbarOpen(true);
     },

@@ -13,7 +13,7 @@ import HomePage from "./pages/HomePage";
 import GuestsPage from "./pages/GuestsPage";
 import MusicControl from "./pages/MusicControl";
 import TokenProcessor from "./pages/TokenProcessor";
-
+import GuestWiFiPage from "./pages/GuestWiFiPage";
 function App() {
   return (
     <BrowserRouter>
@@ -24,6 +24,7 @@ function App() {
         <Route path="/activity" element={<ActivityPage />} />
         <Route path="/guests" element={<GuestsPage />} />
         <Route path="/music" element={<MusicControl />} />
+        <Route path="/wifi" element={<GuestWiFiPage />} />
         <Route path="/:token" element={<TokenProcessor />} />
       </Routes>
     </BrowserRouter>

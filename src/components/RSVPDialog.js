@@ -30,7 +30,8 @@ import Snackbars from "./Snackbars";
 import globals from "../globals";
 import TimeRangePicker from "./TimeRangePicker";
 import moment from "moment";
-import useMediaQuery from '@mui/material/useMediaQuery';
+import useMediaQuery from "@mui/material/useMediaQuery";
+import validator from "validator";
 //Icons
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import AddIcon from "@mui/icons-material/Add";
@@ -41,8 +42,8 @@ import PlusOneDataGrid from "./PlusOneDataGrid";
 import { useTheme } from "@mui/material/styles";
 import ArrivalTimeLineChart from "./ArrivalTimeLineChart";
 
-const PARTY_START = moment(new Date("2022-07-31 16:00"));
-const PARTY_END = moment(new Date("2022-07-31 22:00"));
+const PARTY_START = moment(new Date("2022-08-07 16:00"));
+const PARTY_END = moment(new Date("2022-08-07 22:00"));
 const datacolumns = [
   {
     field: "id",
@@ -87,6 +88,7 @@ class RSVPDialog extends Component {
     partyData: {
       rsvp: null,
       allowEmails: false,
+      waterfight: false,
       name: "",
       email: "",
       emailError: false,
@@ -105,15 +107,104 @@ class RSVPDialog extends Component {
     this.setState({ pageSize: newPageSize });
   };
 
+  fetchData = async (initial = false) => {
+    fetch(`${globals.api_domain}/api/rsvp/get`, {
+      credentials: "include",
+    }).then((res) => {
+      if (res.status === 200) {
+        res.json().then((res) => {
+          res=res.data;
+          if (initial) {
+            this.state.arrivalData = {
+              currentStart: moment(res.currentStart),
+              currentEnd: moment(res.currentEnd),
+            };
+            this.state.partyData = {
+              rsvp: res.rsvp,
+              allowEmails: res.allowEmails ?? false,
+              waterfight: res.waterfight ?? false,
+              name: res.name ?? "",
+              email: res.email ?? "",
+              optionalComments: res.optionalComments ?? "",
+            };
+          } else {
+            this.setState({
+              arrivalData: {
+                currentStart: moment(res.currentStart),
+                currentEnd: moment(res.currentEnd),
+              },
+              partyData: {
+                rsvp: res.rsvp,
+                allowEmails: res.allowEmails ?? false,
+                waterfight: res.waterfight ?? false,
+                name: res.name ?? "",
+                email: res.email ?? "",
+                optionalComments: res.optionalComments ?? "",
+              },
+            }, () => {
+              
+            });
+          }
+        });
+      }
+    });
+  }
+  componentDidMount() {
+    this.fetchData();
+  }
   handleSubmit = () => {
-    var hi=this.TimePickerRef.current.getCurrent();
-    fetch(`${globals.api_domain}/api/success`, {
+    //First validate all inputs
+    let valid = true;
+    var validateobj = {};
+    if (!validator.isEmail(this.state.partyData.email)) {
+      validateobj.emailError = true;
+      valid = false;
+    } else {
+      validateobj.emailError = false;
+    }
+    if (validator.isEmpty(this.state.partyData.name)) {
+      validateobj.nameError = true;
+      valid = false;
+    } else {
+      validateobj.nameError = false;
+    }
+    this.setState({
+      partyData: {
+        ...this.state.partyData,
+        ...validateobj,
+      },
+    });
+    if (!valid) {
+      return;
+    }
+
+    //Now actually submit everything
+    var currentArrivalTime1 = this.TimePickerRef.current.getCurrent();
+    var currentArrivalTime = [0, 0];
+    currentArrivalTime[0] = currentArrivalTime1[0].toDate();
+    currentArrivalTime[1] = currentArrivalTime1[1].toDate();
+    this.setState({
+      arrivalData: {
+        currentStart: currentArrivalTime[0],
+        currentEnd: currentArrivalTime[1],
+      },
+    });
+    fetch(`${globals.api_domain}/api/rsvp/create`, {
       credentials: "include",
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({}),
+      body: JSON.stringify({
+        rsvp: this.state.partyData.rsvp || this.props.rsvp,
+        allowEmails: this.state.partyData.allowEmails,
+        name: this.state.partyData.name,
+        waterfight: this.state.partyData.waterfight,
+        email: this.state.partyData.email,
+        optionalComments: this.state.partyData.optionalComments,
+        arrivalStart: currentArrivalTime[0],
+        arrivalEnd: currentArrivalTime[1],
+      }),
     }).then((res) => {
       if (res.status === 200) {
         this.setState({ successSnackbarOpen: true });
@@ -144,13 +235,18 @@ class RSVPDialog extends Component {
             onClose={() => this.setState({ errorSnackbarOpen: false })}
             severity="error"
           />
-          <DialogTitle>RSVP</DialogTitle>
+          <DialogTitle>
+            <Typography variant="h5">
+              <strong>RSVP</strong>
+            </Typography>
+          </DialogTitle>
           <DialogContent>
             <FormControl>
-              <FormLabel>RSVP</FormLabel>
+              <FormLabel>Will you come?</FormLabel>
               <RadioGroup
                 row
                 name="rsvp-radio"
+                value={this.state.partyData.rsvp ?? this.props.rsvp}
                 onChange={(event) => {
                   this.setState({
                     partyData: {
@@ -159,6 +255,7 @@ class RSVPDialog extends Component {
                     },
                   });
                 }}
+                //defaultValue={this.state.partyData.rsvp}
               >
                 <FormControlLabel
                   value="yes"
@@ -228,6 +325,10 @@ class RSVPDialog extends Component {
                       },
                     });
                   }}
+                  helperText={
+                    this.state.partyData.nameError ? "Name is required" : ""
+                  }
+                  error={this.state.partyData.nameError ?? false}
                   sx={{
                     width: "calc(50% - 8px)",
                   }}
@@ -235,7 +336,7 @@ class RSVPDialog extends Component {
                 <TextField
                   error={this.state.partyData.emailError}
                   helperText={
-                    this.state.partyData.emailError ? "Invalid email" : "e"
+                    this.state.partyData.emailError ? "Invalid email" : ""
                   }
                   id="email"
                   label="Email"
@@ -278,67 +379,88 @@ class RSVPDialog extends Component {
                   By checking the box above, you agree to the legal
                   communications bs that you see on every other site
                 </Typography>
+                <FormControlLabel
+                  control={<Checkbox />}
+                  label="Participate in water fight"
+                  checked={this.state.partyData.waterfight}
+                  onChange={(event) => {
+                    this.setState({
+                      partyData: {
+                        ...this.state.partyData,
+                        waterfight: event.target.checked,
+                      },
+                    });
+                  }}
+                />
+                <Typography>
+                  If you want to participate in a backyard water fight, check
+                  the box above!
+                </Typography>
               </FormGroup>
             </FormControl>
-            <Divider sx={{ margin: "1rem 0" }} />
-            <Typography
-              variant="h6"
-              component="h6"
-              sx={{
-                marginTop: "10px",
-              }}
-            >
-              Arrival Time
-            </Typography>
-            <FormControl sx={{ marginTop: "0px", width: "100%" }}>
-              <FormLabel>
-                Doesn't have to be accurate, but please approximate your arrival
-                time for balancing purposes. Thanks!
-              </FormLabel>
-              <Box
-                sx={{
-                  height: "200px",
-                  mt: 2,
-                  mb: 2,
-                }}
-              >
-                <ParentSize>
-                  {({ width, height }) => (
-                    <ArrivalTimeLineChart width={width} height={height} />
-                  )}
-                </ParentSize>
-              </Box>
-              <TimeRangePicker
-                PARTY_START={PARTY_START}
-                PARTY_END={PARTY_END}
-                ref={this.TimePickerRef}
-              />
-            </FormControl>
-            <Divider sx={{ marginTop: "20px" }} />
-            <Typography
-              variant="h6"
-              component="h6"
-              sx={{
-                marginTop: "10px",
-              }}
-            >
-              +1's
-            </Typography>
-            <FormControl sx={{ marginTop: "0px", width: "100%" }}>
-              <FormLabel>
-                +1's are welcome, but please add them so I can plan accordingly.
-                Thanks!
-              </FormLabel>
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<AddIcon />}
-                sx={{ marginTop: "10px" }}
-              >
-                Add a "Plus One"
-              </Button>
-              <Box sx={{ marginTop: "20px", width: "100%" }}>
-                {/* <DataGrid
+            {this.state.partyData.rsvp === "no" ? null : (
+              <>
+                <Divider sx={{ margin: "1rem 0" }} />
+                <Typography
+                  variant="h6"
+                  component="h6"
+                  sx={{
+                    marginTop: "10px",
+                  }}
+                >
+                  Arrival Time
+                </Typography>
+                <FormControl sx={{ marginTop: "0px", width: "100%" }}>
+                  <FormLabel>
+                    Doesn't have to be accurate, but please approximate your
+                    arrival time for balancing purposes. Thanks!
+                  </FormLabel>
+                  <Box
+                    sx={{
+                      height: "200px",
+                      mt: 2,
+                      mb: 2,
+                    }}
+                  >
+                    <ParentSize>
+                      {({ width, height }) => (
+                        <ArrivalTimeLineChart width={width} height={height} />
+                      )}
+                    </ParentSize>
+                  </Box>
+                  <TimeRangePicker
+                    PARTY_START={PARTY_START}
+                    PARTY_END={PARTY_END}
+                    currentStart={this.state.arrivalData.arrivalStart ?? PARTY_START}
+                    currentEnd={this.state.arrivalData.arrivalEnd ?? PARTY_END}
+                    ref={this.TimePickerRef}
+                  />
+                </FormControl>
+                <Divider sx={{ marginTop: "20px" }} />
+                <Typography
+                  variant="h6"
+                  component="h6"
+                  sx={{
+                    marginTop: "10px",
+                  }}
+                >
+                  +1's
+                </Typography>
+                <FormControl sx={{ marginTop: "0px", width: "100%" }}>
+                  <FormLabel>
+                    +1's are welcome, but please add them so I can plan
+                    accordingly. Thanks!
+                  </FormLabel>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<AddIcon />}
+                    sx={{ marginTop: "10px" }}
+                  >
+                    Add a "Plus One"
+                  </Button>
+                  <Box sx={{ marginTop: "20px", width: "100%" }}>
+                    {/* <DataGrid
                 onPageSizeChange={(newPageSize) => this.setPageSize(newPageSize)}
                 rowsPerPageOptions={[5, 10, 20]}
                 pagination
@@ -348,10 +470,12 @@ class RSVPDialog extends Component {
                 rows={testdata}
                 checkboxSelection
               /> */}
-                <PlusOneDataGrid />
-              </Box>
-            </FormControl>
-            <Divider sx={{ marginTop: "20px" }} />
+                    <PlusOneDataGrid />
+                  </Box>
+                </FormControl>
+                <Divider sx={{ marginTop: "20px" }} />
+              </>
+            )}
             <Typography
               variant="h6"
               component="h6"
@@ -395,6 +519,6 @@ class RSVPDialog extends Component {
 
 export default function RSVPDialogExport({ ...rest }) {
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
   return <RSVPDialog {...rest} fullScreen={fullScreen} />;
 }

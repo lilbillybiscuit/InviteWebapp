@@ -8,8 +8,8 @@ import { forwardRef, useImperativeHandle, useRef } from "react";
 const TimeRangePicker = forwardRef((props, ref) => {
   const PARTY_START = moment(props.PARTY_START);
   const PARTY_END = moment(props.PARTY_END);
-  const [current, setCurrent] = React.useState([PARTY_START, PARTY_END]);
-
+  const [current, setCurrent] = React.useState([props.currentStart, props.currentEnd]);
+  console.log(current);
   const handleArrivalSliderChange = (event, newValue) => {
     setCurrent([
       moment(PARTY_START).add(newValue[0], "m"),
@@ -18,15 +18,20 @@ const TimeRangePicker = forwardRef((props, ref) => {
   };
 
   useImperativeHandle(ref, () => ({
-    getCurrent: () => current,
+    getCurrent: () => {
+      return current;
+    },
+    setCurrent(newCurrent) {
+      setCurrent(newCurrent);
+    }
   }));
 
   return (
     <React.Fragment>
       <Slider
         value={[
-          current[0].diff(PARTY_START, "minutes"),
-          current[1].diff(PARTY_START, "minutes"),
+          moment(current[0]).diff(PARTY_START, "minutes"),
+          moment(current[1]).diff(PARTY_START, "minutes"),
         ]}
         onChange={handleArrivalSliderChange}
         valueLabelDisplay="auto"
