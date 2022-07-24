@@ -176,7 +176,7 @@ export default function ColumnTypesGrid() {
       );
       const thisRow = rows.find((row) => row.id === id);
       console.log(rows, id);
-      fetch("http://localhost:8000/api/tokens/delete", {
+      fetch(`${globals.api_domain}/api/tokens/delete`, {
         method: "POST",
         credentials: "include",
         headers: {

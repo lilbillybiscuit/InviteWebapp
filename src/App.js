@@ -6,7 +6,6 @@ import {
   Route,
 } from "react-router-dom";
 import GradAppBar from "./components/GradAppBar";
-
 //Import pages
 import ActivityPage from "./pages/ActivityPage";
 import HomePage from "./pages/HomePage";
@@ -14,6 +13,7 @@ import GuestsPage from "./pages/GuestsPage";
 import MusicControl from "./pages/MusicControl";
 import TokenProcessor from "./pages/TokenProcessor";
 import GuestWiFiPage from "./pages/GuestWiFiPage";
+
 function App() {
   return (
     <BrowserRouter>

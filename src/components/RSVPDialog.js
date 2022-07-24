@@ -127,6 +127,7 @@ class RSVPDialog extends Component {
               email: res.email ?? "",
               optionalComments: res.optionalComments ?? "",
             };
+            this.props.setRSVP(res.rsvp);
           } else {
             this.setState({
               arrivalData: {
@@ -145,6 +146,7 @@ class RSVPDialog extends Component {
               
             });
           }
+          this.props.setStartRSVP();
         });
       }
     });

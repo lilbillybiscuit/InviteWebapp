@@ -233,7 +233,7 @@ class ResponsiveAppBar extends Component {
                         color: "white",
                       }}
                     >
-                      {this.state.name}
+                      {this.state.name || "Guest"}
                     </Button>
                   </Tooltip>
                 </Box>
