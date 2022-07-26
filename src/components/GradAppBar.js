@@ -149,7 +149,17 @@ class ResponsiveAppBar extends Component {
                 >
                   <MenuIcon />
                 </IconButton>
-                <SchoolIcon
+                <Box sx={{
+                  display: { xs: "none", md: "flex" },
+                  alignItems: "center",
+                  height: "40px",
+                  maxHeight: "40px",
+                  mr: 2,
+                }}>
+                  <img href="/" src="/logo.png" height="100%"/>
+                </Box>
+                
+                {/* <SchoolIcon
                   sx={{
                     display: { xs: "none", md: "flex" },
                     mr: 1,
@@ -172,7 +182,7 @@ class ResponsiveAppBar extends Component {
                   }}
                 >
                   2022
-                </Typography>
+                </Typography> */}
 
                 <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
                   <IconButton
@@ -188,7 +198,7 @@ class ResponsiveAppBar extends Component {
                     <MenuIcon />
                   </IconButton>
                 </Box>
-                <SchoolIcon
+                {/* <SchoolIcon
                   sx={{
                     display: { xs: "flex", md: "none" },
                     mr: 1,
@@ -212,7 +222,17 @@ class ResponsiveAppBar extends Component {
                   }}
                 >
                   2022
-                </Typography>
+                </Typography> */}
+                <Box sx={{
+                  display: { xs: "flex", md: "none"  },
+                  alignItems: "center",
+                  height: "40px",
+                  flexGrow: 1,
+                  maxHeight: "40px",
+                  mr: 2,
+                }}>
+                  <img href="/" src="/logo.png" height="100%"/>
+                </Box>
                 <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
                   {pages.map((obj) => (
                     <Button

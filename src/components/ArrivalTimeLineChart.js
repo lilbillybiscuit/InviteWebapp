@@ -15,18 +15,14 @@ import { localPoint } from "@visx/event";
 import { LinearGradient } from "@visx/gradient";
 import { max, extent, bisector } from "d3-array";
 import { timeFormat } from "d3-time-format";
-
+import globals from "../globals";
+import moment from "moment";
+const PARTY_DURATION = moment(globals.PARTY_END).diff(
+  globals.PARTY_START,
+  "minutes"
+);
 // const times = appleStock.slice(800);
-const times = [];
-var lastattendance=30;
-for (var i=0; i<360; i++) {
-  times.push({
-    minutes: i,
-    attendance: lastattendance,
-  });
-  if (Math.random()<0.8) continue;
-  lastattendance=lastattendance+parseInt(Math.random()*10-5);
-}
+
 export const background = "#DDDDDD";
 export const background2 = "#1876d2";
 export const accentColor = "#edffea";
@@ -38,9 +34,11 @@ const tooltipStyles = {
   color: "white",
 };
 
+const PARTY_START = moment(globals.PARTY_START);
 // util
-const formatDate = timeFormat("%b %d, '%y");
-
+const formatDate = (hi) => {
+  return moment(globals.PARTY_START).add(hi, "m").format("hh:mm a");
+}
 // accessors
 const getMinutes = (d) => new Date(d.minutes);
 const getAttendance = (d) => d.attendance;
@@ -50,12 +48,14 @@ export type AreaProps = {
   width: number,
   height: number,
   margin?: { top: number, right: number, bottom: number, left: number },
+  times: any[],
 };
 
 export default withTooltip(
   ({
     width,
     height,
+    times,
     margin = { top: 0, right: 0, bottom: 0, left: 0 },
     showTooltip,
     hideTooltip,
@@ -64,11 +64,9 @@ export default withTooltip(
     tooltipLeft = 0,
   }: AreaProps & WithTooltipProvidedProps) => {
     if (width < 10) return null;
-
     // bounds
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
-
     // scales
     const horizontalScale = useMemo(
       () =>
@@ -76,16 +74,16 @@ export default withTooltip(
           range: [margin.left, innerWidth + margin.left],
           domain: extent(times, getMinutes),
         }),
-      [innerWidth, margin.left]
+      [innerWidth, margin.left, times]
     );
     const verticalScale = useMemo(
       () =>
         scaleLinear({
           range: [innerHeight + margin.top, margin.top],
-          domain: [0, (max(times, getAttendance) || 0) + innerHeight / 3],
+          domain: [0, (max(times, getAttendance) || 0) + 15],
           nice: true,
         }),
-      [margin.top, innerHeight]
+      [margin.top, innerHeight, times]
     );
 
     // tooltip handler
@@ -100,6 +98,7 @@ export default withTooltip(
         const index = bisectDate(times, x0, 1);
         const d0 = times[index - 1];
         const d1 = times[index];
+        
         let d = d0;
         if (d1 && getMinutes(d1)) {
           d =
@@ -114,7 +113,7 @@ export default withTooltip(
           tooltipTop: verticalScale(getAttendance(d)),
         });
       },
-      [showTooltip, verticalScale, horizontalScale]
+      [showTooltip, verticalScale, horizontalScale, times]
     );
 
     return (
@@ -218,7 +217,8 @@ export default withTooltip(
               key={Math.random()}
               top={tooltipTop - 12}
               left={tooltipLeft + 12}
-              style={tooltipStyles}
+              style={{...tooltipStyles, 
+                color: "#000",}}
             >
               {`${getAttendance(tooltipData)} guests`}
             </TooltipWithBounds>

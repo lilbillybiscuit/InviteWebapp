@@ -26,9 +26,14 @@ import Divider from "@mui/material/Divider";
 import Color from "../components/Color";
 import Footer from "../components/Footer";
 import Avatar from "@mui/material/Avatar";
+import CheckIcon from "@mui/icons-material/Check";
 import PeopleIcon from "@mui/icons-material/People";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
-import CheckIcon from "@mui/icons-material/Check";
+import RemoveIcon from "@mui/icons-material/Remove";
+import CloseIcon from "@mui/icons-material/Close";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 function getWindowDimensions() {
   const { innerWidth: width, innerHeight: height } = window;
   return {
@@ -124,20 +129,103 @@ class HomePage extends Component {
     this.setState({ dialogOpen: false });
   };
 
-  getRSVPText = () => {
-    if (!this.state.rvspedstatus) {
+  getRSVPText = (rsvpedstate) => {
+    if (!rsvpedstate) {
+      const theme = this.props.theme;
       return (
-        <ButtonGroup variant="text" size="large">
-          <Button onClick={this.handleDialogOpenYes}>Yes</Button>
-          <Button onClick={this.handleDialogOpenMaybe}>Maybe</Button>
-          <Button onClick={this.handleDialogOpenNo}>No</Button>
-        </ButtonGroup>
+        <Stack
+          spacing={this.props.fullScreenSm ? 2 : 5}
+          justifyContent="center"
+          direction={this.props.fullScreenSm ? "column" : "row"}
+          sx={{ width: "100%" }}
+        >
+          <Button
+            variant="outlined"
+            onClick={this.handleDialogOpenYes}
+            color="success"
+            size="large"
+            sx={{
+              minWidth: "100px",
+            }}
+          >
+            Yes
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={this.handleDialogOpenMaybe}
+            color="warning"
+            size="large"
+            sx={{
+              minWidth: "100px",
+            }}
+          
+          >
+            Maybe
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={this.handleDialogOpenNo}
+            color="error"
+            size="large"
+            sx={{
+              minWidth: "100px",
+            }}
+          >
+            No
+          </Button>
+        </Stack>
       );
-    } else if (this.state.rsvp === "yes") {
+    } else if (rsvpedstate === "yes") {
       return (
-        <Avatar sx={{ bgcolor: Color.yesColor }}>
-          <CheckIcon />
-        </Avatar>
+        <Box
+          sx={{ display: "flex", alignItems: "center", color: Color.yesColor }}
+        >
+          <Avatar sx={{ bgcolor: Color.yesColor }}>
+            <CheckIcon />
+          </Avatar>
+          <Typography variant="h6" sx={{ ml: 2 }}>
+            You have RSVP'ed Yes
+          </Typography>
+          <Button onClick={this.handleDialogOpenYes} sx={{ ml: 2 }}>
+            Change RSVP
+          </Button>
+        </Box>
+      );
+    } else if (rsvpedstate === "maybe") {
+      return (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            color: Color.maybeColor,
+          }}
+        >
+          <Avatar sx={{ bgcolor: Color.maybeColor }}>
+            <RemoveIcon />
+          </Avatar>
+          <Typography variant="h6" sx={{ ml: 2 }}>
+            You have RSVP'ed Maybe
+          </Typography>
+          <Button onClick={this.handleDialogOpenYes} sx={{ ml: 2 }}>
+            Change RSVP
+          </Button>
+        </Box>
+      );
+    } else if (rsvpedstate === "no") {
+      return (
+        <Box
+          sx={{ display: "flex", alignItems: "center", color: Color.noColor }}
+        >
+          <Avatar sx={{ bgcolor: Color.noColor }}>
+            <RemoveIcon />
+          </Avatar>
+          <Typography variant="h6" sx={{ ml: 2 }}>
+            You have RSVP'ed No
+          </Typography>
+          <Button onClick={this.handleDialogOpenYes} sx={{ ml: 2 }}>
+            Change RSVP
+          </Button>
+        </Box>
       );
     }
   };
@@ -145,7 +233,7 @@ class HomePage extends Component {
   render() {
     return (
       <React.Fragment>
-        <img src="/gradImage.png" style={{ width: "100%" }} />
+        <img src="/gradImage.jpg" style={{ width: "100%" }} />
         <Container maxWidth="md">
           <Typography variant="h3" align="center" gutterBottom sx={{ m: 2 }}>
             {this.state.title}
@@ -171,7 +259,12 @@ class HomePage extends Component {
                 <strong>Details</strong>
               </Typography>
               {this.state.partyInfo ? (
-                <Grid container spacing={2} sx={{ mt: 1 }}>
+                <Grid
+                  container
+                  spacing={2}
+                  columns={{ xs: 4, sm: 8, md: 12 }}
+                  sx={{ mt: 1 }}
+                >
                   <Grid item xs={4}>
                     <Card sx={{ minHeight: "130px" }}>
                       <Box sx={{ m: 2 }}>
@@ -292,12 +385,7 @@ class HomePage extends Component {
                 elevation={3}
                 sx={{ mt: 1, display: "flex", padding: "20px" }}
               >
-                {this.getRSVPText()}
-                {this.state.rsvped || (
-                  <Button onClick={this.handleDialogOpenYes}>
-                    Change RSVP
-                  </Button>
-                )}
+                {this.getRSVPText(this.state.rsvpedstate)}
               </Paper>
               <Typography variant="h4" sx={{ mt: 2 }}>
                 <strong>Message from host</strong>
@@ -320,7 +408,7 @@ class HomePage extends Component {
               this.setState({ rsvped: true });
             }}
             setRSVP={(rsvp) => {
-              this.setState({ rsvpedstate: rsvp });
+              this.setState({ rsvpedstate: rsvp, rsvped: true });
             }}
           />
         </Container>
@@ -330,4 +418,19 @@ class HomePage extends Component {
   }
 }
 
-export default HomePage;
+export default function HomePage2({ ...rest }) {
+  var theme = useTheme();
+  // theme=createTheme(theme, {
+  //   palette: {
+  //     yesButton: Color.yesColor,
+  //     maybeButton: Color.maybeColor,
+  //     noButton: Color.noColor,
+  //   },
+  // })
+  const fullScreenSm = useMediaQuery(theme.breakpoints.down("sm"));
+  return (
+    <ThemeProvider theme={theme}>
+      <HomePage {...rest} fullScreenSm={fullScreenSm} />
+    </ThemeProvider>
+  );
+}

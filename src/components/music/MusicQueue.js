@@ -13,11 +13,6 @@ import Paper from "@mui/material/Paper";
 //icons
 import AddIcon from '@mui/icons-material/Add';
 const FRUITS = [
-  '🍏 Apple',
-  '🍌 Banana',
-  '🍍 Pineapple',
-  '🥥 Coconut',
-  '🍉 Watermelon',
 ];
 
 function renderItem({ item, handleRemoveFruit }) {

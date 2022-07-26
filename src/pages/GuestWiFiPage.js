@@ -27,7 +27,6 @@ class GuestWifiPage extends Component {
     }).then((res) => {
       if (res.status === 200) {
         res.json().then((res) => {
-          console.log(res);
           this.setState({
             wifi_ssid: res.wifi.ssid,
             wifi_password: res.wifi.password,

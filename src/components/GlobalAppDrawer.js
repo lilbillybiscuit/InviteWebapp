@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import {
   List,
   ListItem,
@@ -10,7 +11,7 @@ import {
   ListSubheader,
   ListItemIcon,
 } from "@mui/material";
-
+import HomeIcon from "@mui/icons-material/Home";
 
 class GlobalAppDrawer extends Component {
   state = {};
@@ -21,8 +22,6 @@ class GlobalAppDrawer extends Component {
     });
   };
 
-  
-
   list = () => (
     <Box
       sx={{ width: 250 }}
@@ -30,6 +29,17 @@ class GlobalAppDrawer extends Component {
       onClick={this.props.toggleDrawer(false)}
       onKeyDown={this.props.toggleDrawer(false)}
     >
+      <Typography variant="h5" sx={{ml: 2, mr: 2, mt: 2}}><strong>Bill's Grad Party</strong></Typography>
+      <List>
+        <ListItem key={"home"}>
+          <ListItemButton href={"/"}>
+            <ListItemIcon>
+              <HomeIcon />
+            </ListItemIcon>
+            <ListItemText primary="Home" />
+          </ListItemButton>
+        </ListItem>
+      </List>
       <List
         subheader={
           <ListSubheader
@@ -45,14 +55,14 @@ class GlobalAppDrawer extends Component {
       >
         {this.props.pages.map((page) => (
           <ListItem key={page.name}>
-            
             <ListItemButton href={page.url}>
               <ListItemIcon>{page.icon}</ListItemIcon>
               <ListItemText primary={page.name} />
             </ListItemButton>
           </ListItem>
         ))}
-      </List> <Divider />
+      </List>
+      <Divider />
       <List
         subheader={
           <ListSubheader
@@ -68,38 +78,38 @@ class GlobalAppDrawer extends Component {
       >
         {this.props.globalStuff.map((page) => (
           <ListItem key={page.name}>
-            
             <ListItemButton href={page.url}>
               <ListItemIcon>{page.icon}</ListItemIcon>
               <ListItemText primary={page.name} />
             </ListItemButton>
           </ListItem>
         ))}
-      </List> <Divider />
-      <List
-        subheader={
-          <ListSubheader
-            sx={{
-              fontWeight: "bold",
-            }}
-            component="div"
-            id="nested-settings-list-subheader"
-          >
-            Settings
-          </ListSubheader>
-        }
-      >
-       
-        {this.props.settings.map((setting) => (
-          <ListItem key={setting.name}>
-            
-            <ListItemButton href={setting.url}>
-              <ListItemIcon>{setting.icon}</ListItemIcon>
-              <ListItemText primary={setting.name} />
-            </ListItemButton>
-          </ListItem>
-        ))}
       </List>
+      <Divider />
+      {
+        // <List
+        //   subheader={
+        //     <ListSubheader
+        //       sx={{
+        //         fontWeight: "bold",
+        //       }}
+        //       component="div"
+        //       id="nested-settings-list-subheader"
+        //     >
+        //       Settings
+        //     </ListSubheader>
+        //   }
+        // >
+        //   {this.props.settings.map((setting) => (
+        //     <ListItem key={setting.name}>
+        //       <ListItemButton href={setting.url}>
+        //         <ListItemIcon>{setting.icon}</ListItemIcon>
+        //         <ListItemText primary={setting.name} />
+        //       </ListItemButton>
+        //     </ListItem>
+        //   ))}
+        // </List>
+      }
     </Box>
   );
 

@@ -143,7 +143,6 @@ export default function ColumnTypesGrid() {
 
   const isLoading = (id) => {
     const row1 = rows.find((row) => row.id === id);
-    console.log(row1);
     if (!row1.loading) {
       return false;
     }
@@ -197,9 +196,7 @@ export default function ColumnTypesGrid() {
 
   const copyURL = React.useCallback(
     (id) => () => {
-      console.log(rows, id);
       const rowToCopy = rows.find((row) => row.id === id);
-      console.log(rowToCopy);
       navigator.clipboard.writeText(rowToCopy.shareLink);
       setCopySnackbarOpen(true);
     },

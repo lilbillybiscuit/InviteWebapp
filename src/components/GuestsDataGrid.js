@@ -16,6 +16,8 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import AddTokenMenu from "../components/AddTokenMenu";
+import FormLabel from "@mui/material/FormLabel";
+import FormControl from "@mui/material/FormControl";
 //Icons
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import CloseIcon from "@mui/icons-material/Close";
@@ -25,6 +27,7 @@ import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import CircularProgress from "@mui/material/CircularProgress";
 import AddIcon from "@mui/icons-material/Add";
 import globals from "../globals";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 // import LoadingButton from "@mui/lab/LoadingButton";
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -34,82 +37,6 @@ const getBackgroundColor = (color, mode) =>
 
 const getHoverBackgroundColor = (color, mode) =>
   mode === "dark" ? darken(color, 0.5) : lighten(color, 0.4);
-
-const initialRows = [
-  {
-    id: 1,
-    name: "Damien",
-    age: 25,
-    dateCreated: randomCreatedDate(),
-    lastLogin: randomUpdatedDate(),
-    isAdmin: true,
-    country: "Spain",
-    discount: "",
-  },
-  {
-    id: 2,
-    name: "Nicolas",
-    age: 36,
-    dateCreated: randomCreatedDate(),
-    lastLogin: randomUpdatedDate(),
-    isAdmin: false,
-    country: "France",
-    discount: "",
-  },
-  {
-    id: 3,
-    name: "Kate",
-    age: 19,
-    dateCreated: randomCreatedDate(),
-    lastLogin: randomUpdatedDate(),
-    isAdmin: false,
-    country: "Brazil",
-    discount: "junior",
-  },
-];
-
-const initialRows2 = [
-  {
-    id: 32539408,
-    name: "Test User",
-    shareLink: "https://gradparty.lilbillbiscuit.com/098a7e2bf80d",
-    created: new Date(),
-    invitedby: "Billy Biscuit",
-    status: "noresponse",
-    coming: "noresponse",
-    deletable: true,
-  },
-  {
-    id: 32539456,
-    name: "Test User",
-    shareLink: "https://gradparty.lilbillbiscuit.com/098a7e2bf80d",
-    created: new Date(),
-    invitedby: "Billy Biscuit",
-    status: "yes",
-    coming: "yes",
-    deletable: true,
-  },
-  {
-    id: 32539284,
-    name: "Test User",
-    shareLink: "https://gradparty.lilbillbiscuit.com/098a7e2bf80d",
-    created: new Date(),
-    invitedby: "Billy Biscuit",
-    status: "maybe",
-    coming: "maybe",
-    deletable: true,
-  },
-  {
-    id: 32539234,
-    name: "Test User",
-    shareLink: "https://gradparty.lilbillbiscuit.com/098a7e2bf80d",
-    created: new Date(),
-    invitedby: "Billy Biscuit",
-    status: "no",
-    coming: "no",
-    deletable: true,
-  },
-];
 
 const renderStatus = (props) => {
   if (props === "yes") {
@@ -137,13 +64,20 @@ export default function ColumnTypesGrid() {
   };
 
   const getRowsApi = () => {
-    fetch(`${globals.api_domain}/api/guests/get/all`, {
+    fetch(`${globals.api_domain}/api/guests/get/pending`, {
       method: "GET",
       credentials: "include",
     }).then((res) => {
       if (res.status === 200) {
         res.json().then((data) => {
-          setRows(data.guests);
+          var hi = data.guests.map((guest) => {
+            return {
+              ...guest,
+              created: new Date(guest.created),
+            };
+          });
+
+          setRows(hi);
         });
       } else {
         setLoadFailureSnackbarOpen(true);
@@ -174,6 +108,7 @@ export default function ColumnTypesGrid() {
         prevRows.map((row) => (row.id === id ? { ...row, loading: true } : row))
       );
       const thisRow = rows.find((row) => row.id === id);
+      console.log(rows, id);
       fetch(`${globals.api_domain}/api/tokens/delete`, {
         method: "POST",
         credentials: "include",
@@ -202,6 +137,7 @@ export default function ColumnTypesGrid() {
 
   const copyURL = React.useCallback(
     (id) => () => {
+      console.log(rows);
       const rowToCopy = rows.find((row) => row.id === id);
       navigator.clipboard.writeText(rowToCopy.shareLink);
       setCopySnackbarOpen(true);
@@ -228,21 +164,20 @@ export default function ColumnTypesGrid() {
         field: "shareLink",
         type: "string",
         headerName: "Share Link",
-        width: 300,
+        width: 250,
       },
       {
         field: "created",
-        type: "string",
+        type: "dateTime",
         headerName: "Created",
         width: 110,
-        renderCell: (params) => {"Hi"},
       },
-      {
-        field: "invitedby",
-        type: "string",
-        headerName: "Invited By",
-        width: 100,
-      },
+      // {
+      //   field: "invitedby",
+      //   type: "string",
+      //   headerName: "Invited By",
+      //   width: 100,
+      // },
       {
         field: "actions",
         type: "actions",
@@ -278,147 +213,159 @@ export default function ColumnTypesGrid() {
   );
 
   return (
-    <Container
-      maxWidth="md"
-      sx={{
-        height: "calc(100vh - 200px)",
-        width: "100%",
-
-        "& .super-app-theme--noresponse": {
-          bgcolor: (theme) => getBackgroundColor("#FFFFFF", theme.palette.mode),
-          transition: (theme) =>
-            theme.transitions.create("all", {
-              duration: theme.transitions.duration.shortest,
-            }),
-          "&:hover": {
-            bgcolor: (theme) =>
-              getHoverBackgroundColor("#FFFFFF", theme.palette.mode),
-          },
-        },
-        "& .super-app-theme--yes": {
-          bgcolor: (theme) =>
-            getBackgroundColor(Color.yesColor, theme.palette.mode),
-          transition: (theme) =>
-            theme.transitions.create("all", {
-              duration: theme.transitions.duration.shortest,
-            }),
-          "&:hover": {
-            bgcolor: (theme) =>
-              getHoverBackgroundColor(Color.yesColor, theme.palette.mode),
-          },
-        },
-        "& .super-app-theme--maybe": {
-          bgcolor: (theme) =>
-            getBackgroundColor(Color.maybeColor, theme.palette.mode),
-          transition: (theme) =>
-            theme.transitions.create("all", {
-              duration: theme.transitions.duration.shortest,
-            }),
-          "&:hover": {
-            bgcolor: (theme) =>
-              getHoverBackgroundColor(Color.maybeColor, theme.palette.mode),
-          },
-        },
-        "& .super-app-theme--no": {
-          bgcolor: (theme) =>
-            getBackgroundColor(Color.noColor, theme.palette.mode),
-          transition: (theme) =>
-            theme.transitions.create("all", {
-              duration: theme.transitions.duration.shortest,
-            }),
-          "&:hover": {
-            bgcolor: (theme) =>
-              getHoverBackgroundColor(Color.noColor, theme.palette.mode),
-          },
-        },
-      }}
-    >
+    <FormControl sx={{ mt: 0, width: "100%" }}>
       <Box
         sx={{
-          mt: 3,
-          display: "flex",
+          width: "100%",
+          "& .super-app-theme--noresponse": {
+            bgcolor: (theme) =>
+              getBackgroundColor("#FFFFFF", theme.palette.mode),
+            transition: (theme) =>
+              theme.transitions.create("all", {
+                duration: theme.transitions.duration.shortest,
+              }),
+            "&:hover": {
+              bgcolor: (theme) =>
+                getHoverBackgroundColor("#FFFFFF", theme.palette.mode),
+            },
+          },
+          "& .super-app-theme--yes": {
+            bgcolor: (theme) =>
+              getBackgroundColor(Color.yesColor, theme.palette.mode),
+            transition: (theme) =>
+              theme.transitions.create("all", {
+                duration: theme.transitions.duration.shortest,
+              }),
+            "&:hover": {
+              bgcolor: (theme) =>
+                getHoverBackgroundColor(Color.yesColor, theme.palette.mode),
+            },
+          },
+          "& .super-app-theme--maybe": {
+            bgcolor: (theme) =>
+              getBackgroundColor(Color.maybeColor, theme.palette.mode),
+            transition: (theme) =>
+              theme.transitions.create("all", {
+                duration: theme.transitions.duration.shortest,
+              }),
+            "&:hover": {
+              bgcolor: (theme) =>
+                getHoverBackgroundColor(Color.maybeColor, theme.palette.mode),
+            },
+          },
+          "& .super-app-theme--no": {
+            bgcolor: (theme) =>
+              getBackgroundColor(Color.noColor, theme.palette.mode),
+            transition: (theme) =>
+              theme.transitions.create("all", {
+                duration: theme.transitions.duration.shortest,
+              }),
+            "&:hover": {
+              bgcolor: (theme) =>
+                getHoverBackgroundColor(Color.noColor, theme.palette.mode),
+            },
+          },
         }}
       >
-        <Typography
-          variant="h4"
+        <Box
           sx={{
-            flexGrow: 1,
+            mt: 3,
+            display: "flex",
+            mb: 2,
           }}
         >
-          <strong>Guests</strong>
-        </Typography>
-        <Button
-          sx={{
-            flexGrow: 0,
-          }}
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={(event) => {
-            AddTokenRef.current?.setMenuOpen(event);
-          }}
-        >
-          Invite someone
-        </Button>
-        <AddTokenMenu ref={AddTokenRef} refreshList={getRowsApi} />
-      </Box>
-      <DataGrid
-        sx={{ mt: 3 }}
-        columns={columns2}
-        rows={rows}
-        getRowClassName={(params) => `super-app-theme--${params.row.rsvp}`}
-      />
-      <Snackbar
-        open={copySnackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleCopySnackbarClose}
-      >
-        <Alert
+          <Typography
+            variant="h5"
+            sx={{
+              flexGrow: 1,
+            }}
+          >
+            <strong>Plus Ones</strong>
+          </Typography>
+          <Button
+            sx={{
+              flexGrow: 0,
+            }}
+            variant="contained"
+            startIcon={<PersonAddIcon />}
+            onClick={(event) => {
+              AddTokenRef.current?.setMenuOpen(event);
+            }}
+          >
+            Invite someone
+          </Button>
+
+          <AddTokenMenu ref={AddTokenRef} refreshList={getRowsApi} />
+        </Box>
+        <FormLabel>
+          +1's are welcome, but please add them so I can plan accordingly.
+          Thanks!
+        </FormLabel>
+        <Box sx={{ mt: 2, mb: -3 }}>
+          <Typography variant="subtitle2">Pending Invites</Typography>
+        </Box>
+        <Box sx={{ height: "300px" }}>
+          <DataGrid
+            sx={{ mt: 3 }}
+            columns={columns2}
+            rows={rows}
+            getRowClassName={(params) => `super-app-theme--${params.row.rsvp}`}
+          />
+        </Box>
+
+        <Snackbar
+          open={copySnackbarOpen}
+          autoHideDuration={3000}
           onClose={handleCopySnackbarClose}
-          severity="success"
-          sx={{ width: "100%" }}
         >
-          Successfully copied!
-        </Alert>
-      </Snackbar>
-      <Snackbar
-        open={deleteSnackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleDeleteSnackbarClose}
-      >
-        <Alert
+          <Alert
+            onClose={handleCopySnackbarClose}
+            severity="success"
+            sx={{ width: "100%" }}
+          >
+            Successfully copied!
+          </Alert>
+        </Snackbar>
+        <Snackbar
+          open={deleteSnackbarOpen}
+          autoHideDuration={3000}
           onClose={handleDeleteSnackbarClose}
-          severity="error"
-          sx={{ width: "100%" }}
         >
-          An error occured while deleting the invite
-        </Alert>
-      </Snackbar>
-      <Snackbar
-        open={deleteSuccessSnackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleDeleteSuccessSnackbarClose}
-      >
-        <Alert
+          <Alert
+            onClose={handleDeleteSnackbarClose}
+            severity="error"
+            sx={{ width: "100%" }}
+          >
+            An error occured while deleting the invite
+          </Alert>
+        </Snackbar>
+        <Snackbar
+          open={deleteSuccessSnackbarOpen}
+          autoHideDuration={3000}
           onClose={handleDeleteSuccessSnackbarClose}
-          severity="success"
-          sx={{ width: "100%" }}
         >
-          Successfully deleted the invite
-        </Alert>
-      </Snackbar>
-      <Snackbar
-        open={loadFailureSnackbarOpen}
-        autoHideDuration={3000}
-        onClose={() => setLoadFailureSnackbarOpen(false)}
-      >
-        <Alert
+          <Alert
+            onClose={handleDeleteSuccessSnackbarClose}
+            severity="success"
+            sx={{ width: "100%" }}
+          >
+            Successfully deleted the invite
+          </Alert>
+        </Snackbar>
+        <Snackbar
+          open={loadFailureSnackbarOpen}
+          autoHideDuration={3000}
           onClose={() => setLoadFailureSnackbarOpen(false)}
-          severity="error"
-          sx={{ width: "100%" }}
         >
-          An error occured while loading the guest list
-        </Alert>
-      </Snackbar>
-    </Container>
+          <Alert
+            onClose={() => setLoadFailureSnackbarOpen(false)}
+            severity="error"
+            sx={{ width: "100%" }}
+          >
+            An error occured while loading the guest list
+          </Alert>
+        </Snackbar>
+      </Box>
+    </FormControl>
   );
 }
