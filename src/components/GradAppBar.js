@@ -13,7 +13,7 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import useScrollTrigger from "@mui/material/useScrollTrigger";
 import Slide from "@mui/material/Slide";
-import {grey} from "@mui/material/colors";
+import { grey } from "@mui/material/colors";
 
 //Icons
 import SchoolIcon from "@mui/icons-material/School";
@@ -23,7 +23,7 @@ import PeopleIcon from "@mui/icons-material/People";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MusicNoteIcon from "@mui/icons-material/MusicNote";
-import WifiIcon from '@mui/icons-material/Wifi';
+import WifiIcon from "@mui/icons-material/Wifi";
 
 import GlobalAppDrawer from "./GlobalAppDrawer";
 import GlobalUserSettingsMenu from "./GlobalUserSettingsMenu";
@@ -31,7 +31,7 @@ import globals from "../globals";
 const toolbarColor = "#FFFFFF";
 
 const pages = [
-//  { name: "Activity", url: "/activity", icon: <NotificationsIcon /> },
+  //  { name: "Activity", url: "/activity", icon: <NotificationsIcon /> },
   { name: "Messages", url: "/messages", icon: <MailIcon /> },
   { name: "Guests", url: "/guests", icon: <PeopleIcon /> },
 ];
@@ -46,6 +46,7 @@ const settings = [
 
 function HideOnScroll(props) {
   const { children, window } = props;
+  return children;
   // Note that you normally won't need to set the window ref as useScrollTrigger
   // will default to window.
   // This is only being set here because the demo is in an iframe.
@@ -85,11 +86,14 @@ class ResponsiveAppBar extends Component {
   };
 
   handleDropdownOpen = (event) => {
-    this.setState({ anchorElDropdown: event.currentTarget, dropdownOpen: true });
-  }
+    this.setState({
+      anchorElDropdown: event.currentTarget,
+      dropdownOpen: true,
+    });
+  };
   handleDropdownClose = () => {
     this.setState({ anchorElDropdown: null, dropdownOpen: false });
-  }
+  };
 
   handleMenuOpen = (event) => {
     this.setState({ anchorElNav: event.currentTarget });
@@ -112,8 +116,8 @@ class ResponsiveAppBar extends Component {
       } else {
         this.setState({ name: "Guest" });
       }
-    })
-  }
+    });
+  };
 
   render() {
     return (
@@ -149,16 +153,20 @@ class ResponsiveAppBar extends Component {
                 >
                   <MenuIcon />
                 </IconButton>
-                <Box sx={{
-                  display: { xs: "none", md: "flex" },
-                  alignItems: "center",
-                  height: "40px",
-                  maxHeight: "40px",
-                  mr: 2,
-                }}>
-                  <img href="/" src="/logo.png" height="100%"/>
+                <Box
+                  sx={{
+                    display: { xs: "none", md: "flex" },
+                    alignItems: "center",
+                    height: "40px",
+                    maxHeight: "40px",
+                    mr: 2,
+                  }}
+                >
+                  <a href="/" style={{height: "100%"}}>
+                    <img src="/logo.png" height="100%" />
+                  </a>
                 </Box>
-                
+
                 {/* <SchoolIcon
                   sx={{
                     display: { xs: "none", md: "flex" },
@@ -223,15 +231,19 @@ class ResponsiveAppBar extends Component {
                 >
                   2022
                 </Typography> */}
-                <Box sx={{
-                  display: { xs: "flex", md: "none"  },
-                  alignItems: "center",
-                  height: "40px",
-                  flexGrow: 1,
-                  maxHeight: "40px",
-                  mr: 2,
-                }}>
-                  <img href="/" src="/logo.png" height="100%"/>
+                <Box
+                  sx={{
+                    display: { xs: "flex", md: "none" },
+                    alignItems: "center",
+                    height: "40px",
+                    flexGrow: 1,
+                    maxHeight: "40px",
+                    mr: 2,
+                  }}
+                >
+                  <a href="/" style={{height: "100%"}}>
+                    <img src="/logo.png" height="100%" />
+                  </a>
                 </Box>
                 <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
                   {pages.map((obj) => (

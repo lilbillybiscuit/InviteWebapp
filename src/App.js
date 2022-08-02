@@ -14,6 +14,7 @@ import MusicControl from "./pages/MusicControl";
 import TokenProcessor from "./pages/TokenProcessor";
 import GuestWiFiPage from "./pages/GuestWiFiPage";
 import MessagesPage from "./pages/MessagesPage";
+
 function App() {
   return (
     <BrowserRouter>
