@@ -9,7 +9,7 @@ Public demo here (unlimited use invitation URL): [https://invitedemo.lilbillbisc
 
 And the RSVP Dialog:
 
-![](rsvp_screenshot.png)
+![](rsvp_screenshot2.png)
 
 ## Develop Locally
 First, we will need to run the React website:
